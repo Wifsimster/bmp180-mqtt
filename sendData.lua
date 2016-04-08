@@ -21,7 +21,7 @@ function readBMP()
 end
 
 -- MQTT client
-TOPIC = "/sensors/bureau/bmp180"
+TOPIC = "/sensors/bureau/bmp180/data"
 
 -- Init client with keepalive timer 120sec
 m = mqtt.Client(CLIENT_ID, 120, "", "")
@@ -41,10 +41,10 @@ tmr.alarm(0, 1000, 1, function()
                 DATA = '{"temp":"'..TMP_TEMP..'","pres":"'..TMP_PRES..'"}'
                 -- Publish a message (QoS = 0, retain = 0)        
                 m:publish(TOPIC, DATA, 0, 0, function(conn)
-                    print("Sending data:"..DATA)
+                    print(CLIENT_ID.." sending data: "..DATA.." to "..TOPIC)
                 end)
             else
-                print("No change in values")    
+                print("No change in value, no data send to broker.")
             end
         end)
     end)
