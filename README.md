@@ -12,7 +12,7 @@ Web server waiting for request to send data.
 * ``config.lua``: Configuration variables
 * ``init.lua``: Connect to a wifi AP and then execute main.lua file
 * ``main.lua``: Main file
-* ``bmp180.lua``: BMP180 librairy
+* ``bmp180.lua``: BMP180 library
 
 ## Principle
 
