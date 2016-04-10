@@ -10,14 +10,13 @@ Web server waiting for request to send data.
 
 ##Files
 * ``config.lua``: Configuration variables
-* ``init.lua``: Connect to wifi AP and then execute main.lua file
+* ``init.lua``: Connect to a wifi AP and then execute main.lua file
 * ``main.lua``: Main file
 * 
 ## Principle
 
-1. Connect to a wifi AP
-2. Start a MQTT client and try to connect to a MQTT broker
-3. If temperature or pression change value, publish data to broker
+1. Start a MQTT client then try to connect to a MQTT broker
+2. If temperature or pression change value, publish data to broker
 
 ## Scheme
 
