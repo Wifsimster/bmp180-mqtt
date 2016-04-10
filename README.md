@@ -15,7 +15,7 @@ Web server waiting for request to send data.
 * 
 ## Principle
 
-1. Start a MQTT client then try to connect to a MQTT broker
+1. Start a MQTT client and then try to connect to a MQTT broker
 2. If temperature or pression change value, publish data to broker
 
 ## Scheme
