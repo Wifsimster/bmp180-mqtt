@@ -6,7 +6,6 @@
 --
 -- MIT license, http://opensource.org/licenses/MIT
 -- ***************************************************************************
-
 local moduleName = ...
 local M = {}
 _G[moduleName] = M
