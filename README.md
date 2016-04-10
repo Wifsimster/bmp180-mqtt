@@ -8,6 +8,11 @@ Read BMP180 data (temperature and pression).
 
 Web server waiting for request to send data.
 
+##Files
+* ``config.lua``: Configuration variables
+* ``init.lua``: Connect to wifi AP and then execute main.lua file
+* ``main.lua``: Main file
+* 
 ## Principle
 
 1. Connect to a wifi AP
