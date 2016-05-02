@@ -1,17 +1,15 @@
 require('config')
-require('bmp180')
  
 alti=14 -- Set your altitude in meters
-sda=4	-- GPIO2 connect to SDA BMP180
-scl=3	-- GPIO0 connect to SCL BMP180
 temp=0  -- Temperature
 pres=0 	-- Pressure
 oss=0   -- Over sampling setting
 
 function readBMP()
+    require('bmp180')
     result = {}
 	bmp180 = require("bmp180")
-	bmp180.init(sda, scl)
+	bmp180.init(SDA_PIN, SCL_PIN)
 	bmp180.read(oss)
 	result["temp"] = (bmp180.getTemperature()/10)-2
 	result["pres"] = bmp180.getPressure()/100+alti/8.43
@@ -35,17 +33,19 @@ tmr.alarm(2, 1000, 1, function()
         PRES = tonumber(string.format("%02.1f", readBMP().pres))    
 
         -- Publish a first time the data
-        DATA = '{"temp":"'..TEMP..'","pres":"'..PRES..'"}'
+        DATA = '{"mac":"'..wifi.sta.getmac()..'", "ip":"'..wifi.sta.getip()..'",'
+        DATA = DATA..'"temp":"'..TEMP..'","pres":"'..PRES..'"}'
         m:publish(TOPIC, DATA, 0, 0, function(conn)
             print(CLIENT_ID.." sending data: "..DATA.." to "..TOPIC)
         end)
                 
         -- Check every 5s for values change
-        tmr.alarm(1, 5000, 1, function()
+        tmr.alarm(1, REFRESH_RATE, 1, function()
             TMP_TEMP = tonumber(string.format("%02.1f", readBMP().temp))
             TMP_PRES = tonumber(string.format("%02.1f", readBMP().pres))
-            if(TEMP ~= TMP_TEMP or PRES ~= TMP_PRES) then
-                DATA = '{"temp":"'..TMP_TEMP..'","pres":"'..TMP_PRES..'"}'
+            if(TEMP ~= TMP_TEMP or PRES ~= TMP_PRES) then              
+                DATA = '{"mac":"'..wifi.sta.getmac()..'", "ip":"'..wifi.sta.getip()..'",'
+                DATA = DATA..'"temp":"'..TMP_TEMP..'","pres":"'..TMP_PRES..'"}'
                 -- Publish a message (QoS = 0, retain = 0)
                 m:publish(TOPIC, DATA, 0, 0, function(conn)
                     print(CLIENT_ID.." sending data: "..DATA.." to "..TOPIC)

@@ -1,0 +1,13 @@
+-- Wifi
+AP = ""
+PWD = ""
+
+-- MQTT Broker
+BROKER_IP = "192.168.0.X"
+BROKER_PORT = 1883
+CLIENT_ID = "ESP8266-"..node.chipid()
+REFRESH_RATE = 30000
+
+-- GPIO
+SCL_PIN = 3	-- GPIO0
+SDA_PIN = 4	-- GPIO2
