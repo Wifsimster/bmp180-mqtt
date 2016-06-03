@@ -1,4 +1,6 @@
 require('config')
+
+TOPIC = "/sensors/"..LOCATION.."/bmp180/data"
  
 alti=14 -- Set your altitude in meters
 temp=0  -- Temperature
@@ -19,42 +21,20 @@ function readBMP()
     return result
 end
 
-TOPIC = "/sensors/bureau/bmp180/data"
-
 -- Init client with keepalive timer 120sec
 m = mqtt.Client(CLIENT_ID, 120, "", "")
 
-tmr.alarm(2, 1000, 1, function()
-    tmr.stop(2)
-    print("Connecting to MQTT: "..BROKER_IP..":"..BROKER_PORT.."...")
-    m:connect(BROKER_IP, BROKER_PORT, 0, function(conn)
-        print("Connected to MQTT: "..BROKER_IP..":"..BROKER_PORT.." as "..CLIENT_ID)
+print("Connecting to MQTT: "..BROKER_IP..":"..BROKER_PORT.."...")
+m:connect(BROKER_IP, BROKER_PORT, 0, 1, function(conn)
+    print("Connected to MQTT: "..BROKER_IP..":"..BROKER_PORT.." as "..CLIENT_ID)
+    tmr.alarm(1, REFRESH_RATE, 1, function()
         TEMP = tonumber(string.format("%02.1f", readBMP().temp))
-        PRES = tonumber(string.format("%02.1f", readBMP().pres))    
-
-        -- Publish a first time the data
-        DATA = '{"mac":"'..wifi.sta.getmac()..'", "ip":"'..wifi.sta.getip()..'",'
+        PRES = tonumber(string.format("%02.1f", readBMP().pres))
+        DATA = '{"mac":"'..wifi.sta.getmac()..'","ip":"'..wifi.sta.getip()..'",'
         DATA = DATA..'"temp":"'..TEMP..'","pres":"'..PRES..'"}'
+        -- Publish a message (QoS = 0, retain = 0)       
         m:publish(TOPIC, DATA, 0, 0, function(conn)
             print(CLIENT_ID.." sending data: "..DATA.." to "..TOPIC)
         end)
-                
-        -- Check every 5s for values change
-        tmr.alarm(1, REFRESH_RATE, 1, function()
-            TMP_TEMP = tonumber(string.format("%02.1f", readBMP().temp))
-            TMP_PRES = tonumber(string.format("%02.1f", readBMP().pres))
-            if(TEMP ~= TMP_TEMP or PRES ~= TMP_PRES) then              
-                DATA = '{"mac":"'..wifi.sta.getmac()..'", "ip":"'..wifi.sta.getip()..'",'
-                DATA = DATA..'"temp":"'..TMP_TEMP..'","pres":"'..TMP_PRES..'"}'
-                -- Publish a message (QoS = 0, retain = 0)
-                m:publish(TOPIC, DATA, 0, 0, function(conn)
-                    print(CLIENT_ID.." sending data: "..DATA.." to "..TOPIC)
-                end)
-            else
-                print("No change in value, no data send to broker.")
-            end
-        end)
     end)
 end)
-
-m:close();
