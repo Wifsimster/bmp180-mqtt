@@ -1,6 +1,6 @@
 require('config')
 
-TOPIC = "/sensors/"..LOCATION.."/bmp180/data"
+TOPIC = "/sensors/bmp180/data"
  
 alti=14 -- Set your altitude in meters
 temp=0  -- Temperature
@@ -24,13 +24,17 @@ end
 -- Init client with keepalive timer 120sec
 m = mqtt.Client(CLIENT_ID, 120, "", "")
 
+ip = wifi.sta.getip()
+
+m:lwt("/offline", '{"message":"'..CLIENT_ID..'", "topic":"'..TOPIC..'", "ip":"'..ip..'"}', 0, 0)
+
 print("Connecting to MQTT: "..BROKER_IP..":"..BROKER_PORT.."...")
 m:connect(BROKER_IP, BROKER_PORT, 0, 1, function(conn)
     print("Connected to MQTT: "..BROKER_IP..":"..BROKER_PORT.." as "..CLIENT_ID)
     tmr.alarm(1, REFRESH_RATE, 1, function()
         TEMP = tonumber(string.format("%02.1f", readBMP().temp))
         PRES = tonumber(string.format("%02.1f", readBMP().pres))
-        DATA = '{"mac":"'..wifi.sta.getmac()..'","ip":"'..wifi.sta.getip()..'",'
+        DATA = '{"mac":"'..wifi.sta.getmac()..'","ip":"'..ip..'",'
         DATA = DATA..'"temp":"'..TEMP..'","pres":"'..PRES..'"}'
         -- Publish a message (QoS = 0, retain = 0)       
         m:publish(TOPIC, DATA, 0, 0, function(conn)
